@@ -4,9 +4,32 @@ return {
     dependencies = {
       "nvim-tree/nvim-web-devicons",
     },
+    cmd = {
+      "NvimTreeOpen",
+      "NvimTreeToggle",
+    },
     keys = {
       { "<leader>e", "<cmd>NvimTreeToggle<CR>", desc = "Toggle file explorer" },
     },
+    init = function()
+      vim.api.nvim_create_autocmd("VimEnter", {
+        callback = function()
+          if vim.fn.argc() ~= 1 then
+            return
+          end
+
+          local arg = vim.fn.argv(0)
+
+          if arg == "." or arg == "./" or vim.fn.isdirectory(arg) == 0 then
+            return
+          end
+
+          vim.schedule(function()
+            vim.cmd("NvimTreeOpen " .. vim.fn.fnameescape(arg))
+          end)
+        end,
+      })
+    end,
     config = function()
       vim.api.nvim_set_hl(0, "NvimTreeGitFileNewHL", { fg = "#89d185" })
       vim.api.nvim_set_hl(0, "NvimTreeGitFileDirtyHL", { fg = "#89d185" })
